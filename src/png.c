@@ -19,6 +19,7 @@
 // limitations under the License.
 //===========================================================================
 //
+#include "png.h"
 #include "zlib.h"
 //
 // Convert 8-bit grayscale into RGB565
@@ -59,12 +60,12 @@ static const uint16_t usGrayTo565[] = {0x0000,0x0000,0x0000,0x0000,0x0020,0x0020
 //
 // C interface
 //
-#ifndef __cplusplus
+
 // C API
 int PNG_openRAM(PNGIMAGE *pPNG, uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK *pfnDraw)
 {
     pPNG->iError = PNG_SUCCESS;
-    pPNG->pfnRead = readMem;
+    pPNG->pfnRead = readRAM;
     pPNG->pfnSeek = seekMem;
     pPNG->pfnDraw = pfnDraw;
     pPNG->pfnOpen = NULL;
@@ -128,7 +129,6 @@ uint8_t * PNG_getBuffer(PNGIMAGE *pPNG)
     return pPNG->pImage;
 } /* PNG_getBuffer() */
 
-#endif // !__cplusplus
 PNG_STATIC uint8_t PNGMakeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThreshold)
 {
     uint8_t alpha, c, *s, *d, *pPal;
@@ -627,7 +627,8 @@ PNG_STATIC void DeFilter(uint8_t *pCurr, uint8_t *pPrev, int iWidth, int iPitch)
     } // switch on filter type
 } /* DeFilter() */
 //
-// PNGInit
+// 
+
 // Parse the PNG file header and confirm that it's a valid file
 //
 // returns 0 for success, 1 for failure
@@ -643,7 +644,7 @@ PNG_STATIC int PNGInit(PNGIMAGE *pPNG)
 // This function can be called repeatedly without having
 // to close and re-open the file
 //
-PNG_STATIC int DecodePNG(PNGIMAGE *pPage, void *pUser, int iOptions)
+PNG_STATIC int PNG_decode(PNGIMAGE *pPage, void *pUser, int iOptions)
 {
     int err, y, iLen=0;
     int bDone, iOffset, iFileOffset, iBytesRead;
@@ -673,7 +674,7 @@ PNG_STATIC int DecodePNG(PNGIMAGE *pPage, void *pUser, int iOptions)
     // Insert the memory pointer here to avoid having to use malloc() inside zlib
     state = (struct inflate_state FAR *)pPage->ucZLIB;
     d_stream.state = (struct internal_state FAR *)state;
-    state->window = &pPage->ucZLIB[sizeof(inflate_state)]; // point to 32k dictionary buffer
+    state->window = &pPage->ucZLIB[sizeof(struct inflate_state)]; // point to 32k dictionary buffer
     err = inflateInit(&d_stream);
 #ifdef FUTURE
 //    if (inpage->cCompression == PIL_COMP_IPHONE_FLATE)

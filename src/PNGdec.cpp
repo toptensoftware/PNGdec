@@ -21,13 +21,6 @@
 //
 #include "PNGdec.h"
 
-// forward references
-PNG_STATIC int PNGInit(PNGIMAGE *pPNG);
-PNG_STATIC int DecodePNG(PNGIMAGE *pImage, void *pUser, int iOptions);
-PNG_STATIC uint8_t PNGMakeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThreshold);
-// Include the C code which does the actual work
-#include "png.inl"
-
 //
 // Memory initialization
 //
@@ -191,7 +184,7 @@ void PNG::close()
 //
 int PNG::decode(void *pUser, int iOptions)
 {
-    return DecodePNG(&_png, pUser, iOptions);
+    return PNG_decode(&_png, pUser, iOptions);
 } /* decode() */
 //
 // Convert a line of native pixels (all supported formats) into RGB565
