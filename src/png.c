@@ -64,15 +64,16 @@ static const uint16_t usGrayTo565[] = {0x0000,0x0000,0x0000,0x0000,0x0020,0x0020
 // C API
 int PNG_openRAM(PNGIMAGE *pPNG, uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK *pfnDraw)
 {
+    memset(pPNG, 0, sizeof(PNGIMAGE));
     pPNG->iError = PNG_SUCCESS;
-    pPNG->pfnRead = readRAM;
-    pPNG->pfnSeek = seekMem;
+    pPNG->pfnRead = PNG_readMem;
+    pPNG->pfnSeek = PNG_seekMem;
     pPNG->pfnDraw = pfnDraw;
     pPNG->pfnOpen = NULL;
     pPNG->pfnClose = NULL;
     pPNG->PNGFile.iSize = iDataSize;
     pPNG->PNGFile.pData = pData;
-    return PNGInit(pPNG);
+    return PNG_init(pPNG);
 } /* PNG_openRAM() */
 
 #ifdef __LINUX__
@@ -129,7 +130,13 @@ uint8_t * PNG_getBuffer(PNGIMAGE *pPNG)
     return pPNG->pImage;
 } /* PNG_getBuffer() */
 
-PNG_STATIC uint8_t PNGMakeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThreshold)
+
+void PNG_setBuffer(PNGIMAGE* pPNG, uint8_t* pBuffer)
+{
+    pPNG->pImage = pBuffer;
+}
+
+PNG_STATIC uint8_t PNG_makeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThreshold)
 {
     uint8_t alpha, c, *s, *d, *pPal;
     uint8_t cHasOpaque = 0;
@@ -224,7 +231,7 @@ PNG_STATIC uint8_t PNGMakeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThresho
 // handles all standard pixel types
 // written for simplicity, not necessarily performance
 //
-PNG_STATIC void PNGRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, uint32_t u32Bkgd, int iHasAlpha)
+PNG_STATIC void PNG_toRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, uint32_t u32Bkgd, int iHasAlpha)
 {
     int x, j;
     uint16_t usPixel, *pDest = pPixels;
@@ -442,7 +449,7 @@ PNG_STATIC void PNGRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, uin
 //
 // Helper functions for memory based images
 //
-PNG_STATIC int32_t seekMem(PNGFILE *pFile, int32_t iPosition)
+PNG_STATIC int32_t PNG_seekMem(PNGFILE *pFile, int32_t iPosition)
 {
     if (iPosition < 0) iPosition = 0;
     else if (iPosition >= pFile->iSize) iPosition = pFile->iSize-1;
@@ -450,7 +457,7 @@ PNG_STATIC int32_t seekMem(PNGFILE *pFile, int32_t iPosition)
     return iPosition;
 } /* seekMem() */
 
-PNG_STATIC int32_t readFLASH(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
+PNG_STATIC int32_t PNG_readFlash(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
 {
     int32_t iBytesRead;
 
@@ -464,7 +471,7 @@ PNG_STATIC int32_t readFLASH(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
     return iBytesRead;
 } /* readFLASH() */
 
-PNG_STATIC int32_t readRAM(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
+PNG_STATIC int32_t PNG_readMem(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
 {
     int32_t iBytesRead;
 
@@ -633,7 +640,7 @@ PNG_STATIC void DeFilter(uint8_t *pCurr, uint8_t *pPrev, int iWidth, int iPitch)
 //
 // returns 0 for success, 1 for failure
 //
-PNG_STATIC int PNGInit(PNGIMAGE *pPNG)
+PNG_STATIC int PNG_init(PNGIMAGE *pPNG)
 {
     return PNGParseInfo(pPNG); // gather info for image
 } /* PNGInit() */

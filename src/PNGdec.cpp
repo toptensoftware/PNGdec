@@ -28,14 +28,14 @@ int PNG::openRAM(uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK *pfnDraw)
 {
     memset(&_png, 0, sizeof(PNGIMAGE));
     _png.ucMemType = PNG_MEM_RAM;
-    _png.pfnRead = readRAM;
-    _png.pfnSeek = seekMem;
+    _png.pfnRead = PNG_readMem;
+    _png.pfnSeek = PNG_seekMem;
     _png.pfnDraw = pfnDraw;
     _png.pfnOpen = NULL;
     _png.pfnClose = NULL;
     _png.PNGFile.iSize = iDataSize;
     _png.PNGFile.pData = pData;
-    return PNGInit(&_png);
+    return PNG_init(&_png);
 } /* openRAM() */
 //
 // It's necessary to separate out a FLASH version on Harvard architecture machines
@@ -44,14 +44,14 @@ int PNG::openFLASH(uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK *pfnDraw)
 {
     memset(&_png, 0, sizeof(PNGIMAGE));
     _png.ucMemType = PNG_MEM_FLASH;
-    _png.pfnRead = readFLASH;
-    _png.pfnSeek = seekMem;
+    _png.pfnRead = PNG_readFlash;
+    _png.pfnSeek = PNG_seekMem;
     _png.pfnDraw = pfnDraw;
     _png.pfnOpen = NULL;
     _png.pfnClose = NULL;
     _png.PNGFile.iSize = iDataSize;
     _png.PNGFile.pData = pData;
-    return PNGInit(&_png);
+    return PNG_init(&_png);
 } /* openRAM() */
 
 //
@@ -68,7 +68,7 @@ int PNG::open(const char *szFilename, PNG_OPEN_CALLBACK *pfnOpen, PNG_CLOSE_CALL
     _png.PNGFile.fHandle = (*pfnOpen)(szFilename, &_png.PNGFile.iSize);
     if (_png.PNGFile.fHandle == NULL)
        return 0;
-    return PNGInit(&_png);
+    return PNG_init(&_png);
 
 } /* open() */
 //
@@ -193,10 +193,10 @@ int PNG::decode(void *pUser, int iOptions)
 //
 void PNG::getLineAsRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndianness, uint32_t u32Bkgd)
 {
-    PNGRGB565(pDraw, pPixels, iEndianness, u32Bkgd, hasAlpha());
+    PNG_toRGB565(pDraw, pPixels, iEndianness, u32Bkgd, hasAlpha());
 } /* getLineAsRGB565() */
 
 uint8_t PNG::getAlphaMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThreshold)
 {
-    return PNGMakeMask(pDraw, pMask, ucThreshold);
+    return PNG_makeMask(pDraw, pMask, ucThreshold);
 } /* getAlphaMask() */
