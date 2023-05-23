@@ -31,12 +31,7 @@
 #define memcpy_P memcpy
 #define PROGMEM
 #elif defined(_MSC_VER)
-    typedef unsigned char uint8_t;
-    typedef unsigned short uint16_t;
-    typedef unsigned int uint32_t;
-    typedef char int8_t;
-    typedef short int16_t;
-    typedef int int32_t;
+#include <stdint.h>
 #define memcpy_P memcpy
 #define __builtin_bswap16 _byteswap_ushort 
 #else
