@@ -100,12 +100,12 @@ void PNG_close(PNGIMAGE *pPNG)
         (*pPNG->pfnClose)(pPNG->PNGFile.fHandle);
 } /* PNG_close() */
 
-int PNG_getWidth(PNGIMAGE *pPNG)
+int PNG_getWidth(const PNGIMAGE *pPNG)
 {
     return pPNG->iWidth;
 } /* PNG_getsWidth() */
 
-int PNG_getHeight(PNGIMAGE *pPNG)
+int PNG_getHeight(const PNGIMAGE *pPNG)
 {
     return pPNG->iHeight;
 } /* PNG_getHeight() */

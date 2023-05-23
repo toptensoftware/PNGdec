@@ -179,8 +179,8 @@ typedef struct png_image_tag
     int PNG_init(PNGIMAGE* pPNG);
     int PNG_openRAM(PNGIMAGE* pPNG, uint8_t* pData, int iDataSize, PNG_DRAW_CALLBACK* pfnDraw);
     int PNG_openFile(PNGIMAGE* pPNG, const char* szFilename);
-    int PNG_getWidth(PNGIMAGE* pPNG);
-    int PNG_getHeight(PNGIMAGE* pPNG);
+    int PNG_getWidth(const PNGIMAGE* pPNG);
+    int PNG_getHeight(const PNGIMAGE* pPNG);
     int PNG_decode(PNGIMAGE* pPNG, void* pUser, int iOptions);
     void PNG_close(PNGIMAGE* pPNG);
     int PNG_getLastError(PNGIMAGE* pPNG);
