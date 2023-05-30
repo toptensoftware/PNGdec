@@ -127,7 +127,7 @@ typedef struct png_file_tag
 {
     int32_t iPos; // current file position
     int32_t iSize; // file size
-    uint8_t* pData; // memory file pointer
+    const uint8_t* pData; // memory file pointer
     void* fHandle; // class pointer to File/SdFat or whatever you want
 } PNGFILE;
 
@@ -167,7 +167,7 @@ typedef struct png_image_tag
 #define PNG_STATIC
 
 int PNG_init(PNGIMAGE* pPNG);
-int PNG_openRAM(PNGIMAGE* pPNG, uint8_t* pData, int iDataSize, PNG_DRAW_CALLBACK* pfnDraw);
+int PNG_openRAM(PNGIMAGE* pPNG, const uint8_t* pData, int iDataSize, PNG_DRAW_CALLBACK* pfnDraw);
 int PNG_openFile(PNGIMAGE* pPNG, const char* szFilename, PNG_DRAW_CALLBACK *pfnDraw);
 int PNG_getWidth(const PNGIMAGE* pPNG);
 int PNG_getHeight(const PNGIMAGE* pPNG);

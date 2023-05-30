@@ -62,7 +62,7 @@ static const uint16_t usGrayTo565[] = {0x0000,0x0000,0x0000,0x0000,0x0020,0x0020
 //
 
 // C API
-int PNG_openRAM(PNGIMAGE *pPNG, uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK *pfnDraw)
+int PNG_openRAM(PNGIMAGE *pPNG, const uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK *pfnDraw)
 {
     memset(pPNG, 0, sizeof(PNGIMAGE));
     pPNG->iError = PNG_SUCCESS;
