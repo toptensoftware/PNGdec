@@ -23,20 +23,15 @@
 #ifndef __PNG_H__
 #define __PNG_H__
 
-#if defined( __MACH__ ) || defined( __LINUX__ ) || defined( __MCUXPRESSO )
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
-#define memcpy_P memcpy
-#define PROGMEM
-#elif defined(_MSC_VER)
-#include <stdint.h>
-#define memcpy_P memcpy
+
+#if defined(_MSC_VER)
 #define __builtin_bswap16 _byteswap_ushort 
-#else
-#include <Arduino.h>
 #endif
+
 #include "zutil.h"
 #include "inftrees.h"
 #include "inflate.h"
@@ -171,30 +166,30 @@ typedef struct png_image_tag
 
 #define PNG_STATIC
 
-    int PNG_init(PNGIMAGE* pPNG);
-    int PNG_openRAM(PNGIMAGE* pPNG, uint8_t* pData, int iDataSize, PNG_DRAW_CALLBACK* pfnDraw);
-    int PNG_openFile(PNGIMAGE* pPNG, const char* szFilename, PNG_DRAW_CALLBACK *pfnDraw);
-    int PNG_getWidth(const PNGIMAGE* pPNG);
-    int PNG_getHeight(const PNGIMAGE* pPNG);
-    int PNG_decode(PNGIMAGE* pPNG, void* pUser, int iOptions);
-    void PNG_close(PNGIMAGE* pPNG);
-    int PNG_getLastError(PNGIMAGE* pPNG);
-    int PNG_getBpp(PNGIMAGE* pPNG);
-    int PNG_getLastError(PNGIMAGE* pPNG);
-    int PNG_getBufferSize(PNGIMAGE* pPNG);
-    uint8_t* PNG_getPalette(PNGIMAGE* pPNG);
-    int PNG_getPixelType(PNGIMAGE* pPNG);
-    int PNG_hasAlpha(PNGIMAGE* pPNG);
-    int PNG_isInterlaced(PNGIMAGE* pPNG);
-    uint8_t* PNG_getBuffer(PNGIMAGE* pPNG);
-    void PNG_setBuffer(PNGIMAGE* pPNG, uint8_t* pBuffer);
-    int32_t PNG_seekMem(PNGFILE* pFile, int32_t iPosition);
-    int32_t PNG_readFlash(PNGFILE* pFile, uint8_t* pBuf, int32_t iLen);
-    int32_t PNG_readMem(PNGFILE* pFile, uint8_t* pBuf, int32_t iLen);
-    uint8_t PNG_makeMask(PNGDRAW* pDraw, uint8_t* pMask, uint8_t ucThreshold);
-    void PNG_toRGB565(PNGDRAW* pDraw, uint16_t* pPixels, int iEndiannes, uint32_t u32Bkgd, int iHasAlpha);
+int PNG_init(PNGIMAGE* pPNG);
+int PNG_openRAM(PNGIMAGE* pPNG, uint8_t* pData, int iDataSize, PNG_DRAW_CALLBACK* pfnDraw);
+int PNG_openFile(PNGIMAGE* pPNG, const char* szFilename, PNG_DRAW_CALLBACK *pfnDraw);
+int PNG_getWidth(const PNGIMAGE* pPNG);
+int PNG_getHeight(const PNGIMAGE* pPNG);
+int PNG_decode(PNGIMAGE* pPNG, void* pUser, int iOptions);
+void PNG_close(PNGIMAGE* pPNG);
+int PNG_getLastError(PNGIMAGE* pPNG);
+int PNG_getBpp(PNGIMAGE* pPNG);
+int PNG_getLastError(PNGIMAGE* pPNG);
+int PNG_getBufferSize(PNGIMAGE* pPNG);
+uint8_t* PNG_getPalette(PNGIMAGE* pPNG);
+int PNG_getPixelType(PNGIMAGE* pPNG);
+int PNG_hasAlpha(PNGIMAGE* pPNG);
+int PNG_isInterlaced(PNGIMAGE* pPNG);
+uint8_t* PNG_getBuffer(PNGIMAGE* pPNG);
+void PNG_setBuffer(PNGIMAGE* pPNG, uint8_t* pBuffer);
+int32_t PNG_seekMem(PNGFILE* pFile, int32_t iPosition);
+int32_t PNG_readFlash(PNGFILE* pFile, uint8_t* pBuf, int32_t iLen);
+int32_t PNG_readMem(PNGFILE* pFile, uint8_t* pBuf, int32_t iLen);
+uint8_t PNG_makeMask(PNGDRAW* pDraw, uint8_t* pMask, uint8_t ucThreshold);
+void PNG_toRGB565(PNGDRAW* pDraw, uint16_t* pPixels, int iEndiannes, uint32_t u32Bkgd, int iHasAlpha);
 
-    // Due to unaligned memory causing an exception, we have to do these macros the slow way
+// Due to unaligned memory causing an exception, we have to do these macros the slow way
 #define INTELSHORT(p) ((*p) + (*(p+1)<<8))
 #define INTELLONG(p) ((*p) + (*(p+1)<<8) + (*(p+2)<<16) + (*(p+3)<<24))
 #define MOTOSHORT(p) (((*(p))<<8) + (*(p+1)))

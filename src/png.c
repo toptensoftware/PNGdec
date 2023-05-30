@@ -76,40 +76,6 @@ int PNG_openRAM(PNGIMAGE *pPNG, uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK
     return PNG_init(pPNG);
 } /* PNG_openRAM() */
 
-#ifdef __LINUX__
-
-static int32_t readFile(PNGFILE* pFile, uint8_t* pBuf, int32_t iLen)
-{
-    return (int32_t)fread(pBuf, 1, iLen, (FILE*)pFile->fHandle);
-}
-static int32_t seekFile(PNGFILE* pFile, int32_t iPosition)
-{
-    return (int32_t)fseek((FILE*)pFile->fHandle, iPosition, SEEK_SET);
-}
-
-static void closeFile(PNGFILE* pFile)
-{
-    fclose((FILE*)pFile->fHandle);
-}
-
-
-int PNG_openFile(PNGIMAGE *pPNG, const char *szFilename, PNG_DRAW_CALLBACK *pfnDraw)
-{
-    pPNG->iError = PNG_SUCCESS;
-    pPNG->pfnRead = readFile;
-    pPNG->pfnSeek = seekFile;
-    pPNG->pfnDraw = pfnDraw;
-    pPNG->pfnOpen = NULL;
-    pPNG->pfnClose = closeFile;
-    pPNG->PNGFile.fHandle = fopen(szFilename, "r+b");
-    if (pPNG->PNGFile.fHandle == NULL)
-       return 0;
-    fseek((FILE *)pPNG->PNGFile.fHandle, 0, SEEK_END);
-    pPNG->PNGFile.iSize = (int)ftell((FILE *)pPNG->PNGFile.fHandle);
-    fseek((FILE *)pPNG->PNGFile.fHandle, 0, SEEK_SET);
-    return PNG_init(pPNG);
-} /* PNG_openFile() */
-#endif // __LINUX__
 void PNG_close(PNGIMAGE *pPNG)
 {
     if (pPNG->pfnClose)
@@ -152,7 +118,7 @@ void PNG_setBuffer(PNGIMAGE* pPNG, uint8_t* pBuffer)
     pPNG->pImage = pBuffer;
 }
 
-PNG_STATIC uint8_t PNG_makeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThreshold)
+uint8_t PNG_makeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThreshold)
 {
     uint8_t alpha, c, *s, *d, *pPal;
     uint8_t cHasOpaque = 0;
@@ -247,7 +213,7 @@ PNG_STATIC uint8_t PNG_makeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThresh
 // handles all standard pixel types
 // written for simplicity, not necessarily performance
 //
-PNG_STATIC void PNG_toRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, uint32_t u32Bkgd, int iHasAlpha)
+void PNG_toRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, uint32_t u32Bkgd, int iHasAlpha)
 {
     int x, j;
     uint16_t usPixel, *pDest = pPixels;
@@ -465,7 +431,7 @@ PNG_STATIC void PNG_toRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, 
 //
 // Helper functions for memory based images
 //
-PNG_STATIC int32_t PNG_seekMem(PNGFILE *pFile, int32_t iPosition)
+int32_t PNG_seekMem(PNGFILE *pFile, int32_t iPosition)
 {
     if (iPosition < 0) iPosition = 0;
     else if (iPosition >= pFile->iSize) iPosition = pFile->iSize-1;
@@ -473,7 +439,8 @@ PNG_STATIC int32_t PNG_seekMem(PNGFILE *pFile, int32_t iPosition)
     return iPosition;
 } /* seekMem() */
 
-PNG_STATIC int32_t PNG_readFlash(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
+#if 0
+int32_t PNG_readFlash(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
 {
     int32_t iBytesRead;
 
@@ -486,8 +453,9 @@ PNG_STATIC int32_t PNG_readFlash(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
     pFile->iPos += iBytesRead;
     return iBytesRead;
 } /* readFLASH() */
+#endif
 
-PNG_STATIC int32_t PNG_readMem(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
+int32_t PNG_readMem(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
 {
     int32_t iBytesRead;
 
@@ -504,7 +472,7 @@ PNG_STATIC int32_t PNG_readMem(PNGFILE *pFile, uint8_t *pBuf, int32_t iLen)
 // Verify it's a PNG file and then parse the IHDR chunk
 // to get basic image size/type/etc
 //
-PNG_STATIC int PNGParseInfo(PNGIMAGE *pPage)
+int PNGParseInfo(PNGIMAGE *pPage)
 {
     uint8_t *s = pPage->ucFileBuf;
     int iBytesRead;
@@ -557,7 +525,7 @@ PNG_STATIC int PNGParseInfo(PNGIMAGE *pPage)
 //
 // De-filter the current line of pixels
 //
-PNG_STATIC void DeFilter(uint8_t *pCurr, uint8_t *pPrev, int iWidth, int iPitch)
+void DeFilter(uint8_t *pCurr, uint8_t *pPrev, int iWidth, int iPitch)
 {
     uint8_t ucFilter = *pCurr++;
     int x, iBpp;
@@ -656,7 +624,7 @@ PNG_STATIC void DeFilter(uint8_t *pCurr, uint8_t *pPrev, int iWidth, int iPitch)
 //
 // returns 0 for success, 1 for failure
 //
-PNG_STATIC int PNG_init(PNGIMAGE *pPNG)
+int PNG_init(PNGIMAGE *pPNG)
 {
     return PNGParseInfo(pPNG); // gather info for image
 } /* PNGInit() */
@@ -667,7 +635,7 @@ PNG_STATIC int PNG_init(PNGIMAGE *pPNG)
 // This function can be called repeatedly without having
 // to close and re-open the file
 //
-PNG_STATIC int PNG_decode(PNGIMAGE *pPage, void *pUser, int iOptions)
+int PNG_decode(PNGIMAGE *pPage, void *pUser, int iOptions)
 {
     int err, y, iLen=0;
     int bDone, iOffset, iFileOffset, iBytesRead;
