@@ -141,7 +141,7 @@ typedef int32_t(PNG_READ_CALLBACK)(PNGFILE* pFile, uint8_t* pBuf, int32_t iLen);
 typedef int32_t(PNG_SEEK_CALLBACK)(PNGFILE* pFile, int32_t iPosition);
 typedef void* (PNG_OPEN_CALLBACK)(const char* szFilename, int32_t* pFileSize);
 typedef void (PNG_DRAW_CALLBACK)(PNGDRAW*);
-typedef void (PNG_CLOSE_CALLBACK)(void* pHandle);
+typedef void (PNG_CLOSE_CALLBACK)(PNGFILE* pFile);
 
 //
 // our private structure to hold a JPEG image decode state
@@ -173,7 +173,7 @@ typedef struct png_image_tag
 
     int PNG_init(PNGIMAGE* pPNG);
     int PNG_openRAM(PNGIMAGE* pPNG, uint8_t* pData, int iDataSize, PNG_DRAW_CALLBACK* pfnDraw);
-    int PNG_openFile(PNGIMAGE* pPNG, const char* szFilename);
+    int PNG_openFile(PNGIMAGE* pPNG, const char* szFilename, PNG_DRAW_CALLBACK *pfnDraw);
     int PNG_getWidth(const PNGIMAGE* pPNG);
     int PNG_getHeight(const PNGIMAGE* pPNG);
     int PNG_decode(PNGIMAGE* pPNG, void* pUser, int iOptions);

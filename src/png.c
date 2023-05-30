@@ -77,6 +77,22 @@ int PNG_openRAM(PNGIMAGE *pPNG, uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK
 } /* PNG_openRAM() */
 
 #ifdef __LINUX__
+
+static int32_t readFile(PNGFILE* pFile, uint8_t* pBuf, int32_t iLen)
+{
+    return (int32_t)fread(pBuf, 1, iLen, (FILE*)pFile->fHandle);
+}
+static int32_t seekFile(PNGFILE* pFile, int32_t iPosition)
+{
+    return (int32_t)fseek((FILE*)pFile->fHandle, iPosition, SEEK_SET);
+}
+
+static void closeFile(PNGFILE* pFile)
+{
+    fclose((FILE*)pFile->fHandle);
+}
+
+
 int PNG_openFile(PNGIMAGE *pPNG, const char *szFilename, PNG_DRAW_CALLBACK *pfnDraw)
 {
     pPNG->iError = PNG_SUCCESS;
@@ -91,13 +107,13 @@ int PNG_openFile(PNGIMAGE *pPNG, const char *szFilename, PNG_DRAW_CALLBACK *pfnD
     fseek((FILE *)pPNG->PNGFile.fHandle, 0, SEEK_END);
     pPNG->PNGFile.iSize = (int)ftell((FILE *)pPNG->PNGFile.fHandle);
     fseek((FILE *)pPNG->PNGFile.fHandle, 0, SEEK_SET);
-    return PNGInit(pPNG);
+    return PNG_init(pPNG);
 } /* PNG_openFile() */
 #endif // __LINUX__
 void PNG_close(PNGIMAGE *pPNG)
 {
     if (pPNG->pfnClose)
-        (*pPNG->pfnClose)(pPNG->PNGFile.fHandle);
+        (*pPNG->pfnClose)(&pPNG->PNGFile);
 } /* PNG_close() */
 
 int PNG_getWidth(const PNGIMAGE *pPNG)

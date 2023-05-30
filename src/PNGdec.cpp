@@ -173,7 +173,7 @@ uint8_t * PNG::getPalette()
 void PNG::close()
 {
     if (_png.pfnClose)
-        (*_png.pfnClose)(_png.PNGFile.fHandle);
+        (*_png.pfnClose)(&_png.PNGFile);
 } /* close() */
 
 //
