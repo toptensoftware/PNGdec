@@ -102,6 +102,16 @@ uint8_t *PNG_getPalette(PNGIMAGE *pPNG)
     return pPNG->ucPalette;
 } /* PNG_getPalette() */
 
+int PNG_getBpp(const PNGIMAGE* pPNG)
+{
+    return pPNG->ucBpp;
+}
+
+int PNG_getPixelType(const PNGIMAGE* pPNG)
+{
+    return pPNG->ucPixelType;
+}
+
 int PNG_getBufferSize(PNGIMAGE *pPNG)
 {
     return pPNG->iHeight * pPNG->iPitch;
